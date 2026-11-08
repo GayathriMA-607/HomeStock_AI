@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>HomeStock AI</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+</head>
+
+<body class="auth-body">
+    <div class="auth-wrap">
+        <div class="auth-art">
+            <div class="brand"><span class="brand-mark">⌂</span> HomeStock <b>AI</b></div>
+            <div class="auth-copy"><span class="eyebrow">A calmer, smarter home</span>
+                <h1>Everything at home,<br><em>in its place.</em></h1>
+                <p>Keep track of what you have, what to use next, and what to add to your shopping list.</p>
+                <div class="art-pills"><span>✦ Smart inventory</span><span>✦ Thoughtful reminders</span><span>✦ Less
+                        waste</span></div>
+            </div>
+            <div class="auth-art-foot">Your home, thoughtfully organized.</div>
+        </div>
+        <div class="auth-panel">
+            <div class="auth-mobile-brand">⌂ HomeStock <b>AI</b></div>
+            <div class="auth-form"><span class="eyebrow">WELCOME {{ 'BACK' if mode=='login' else 'HOME' }}</span>
+                <h2>{{ 'Sign in to your home' if mode=='login' else 'Create your account' }}</h2>
+                <p class="muted">{{ 'Your household essentials are just a moment away.' if mode=='login' else 'Start
+                    organizing your household in one place.' }}</p>
+                {% with messages=get_flashed_messages(with_categories=true) %}{% for category,message in messages %}<div
+                    class="flash {{category}}">{{message}}</div>{% endfor %}{% endwith %}
+                <form method="post">{% if mode=='register' %}<label>Your name<input name="name"
+                            placeholder="e.g. Ananya" required></label>{% endif %}<label>Email address<input
+                            type="email" name="email" placeholder="you@example.com"
+                            required></label><label>Password<input type="password" name="password"
+                            placeholder="At least 8 characters" minlength="8" required></label><button
+                        class="btn primary full" type="submit">{{ 'Sign in' if mode=='login' else 'Create account' }}
+                        <span>→</span></button></form>
+                <p class="switch">{{ "New to HomeStock?" if mode=='login' else 'Already have an account?' }} <a
+                        href="{{ url_for('register' if mode=='login' else 'login') }}">{{ 'Create an account' if
+                        mode=='login' else 'Sign in' }}</a></p><small class="muted">Local prototype · Your inventory is
+                    private to your account.</small>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

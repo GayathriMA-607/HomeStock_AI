@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>HomeStock AI — Your home, in order</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+
+    <meta name="theme-color" content="#355d49">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        /* Profile page layout */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .profile-card {
+            min-width: 0;
+            padding: 26px;
+            border-radius: 20px;
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 26px;
+        }
+
+        .profile-photo-wrapper {
+            width: 92px;
+            height: 92px;
+            flex: 0 0 92px;
+            overflow: hidden;
+            border-radius: 50%;
+            background: #e9d9c9;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 1px #e5e9e3;
+            display: grid;
+            place-items: center;
+        }
+
+        .profile-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-initial {
+            color: #684f3f;
+            font-size: 34px;
+            font-weight: 700;
+        }
+
+        .profile-information {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .profile-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 13px 15px;
+            background: #f7f8f5;
+            border-radius: 12px;
+            min-width: 0;
+        }
+
+        .profile-field span {
+            color: #87938b;
+            font-size: 12px;
+        }
+
+        .profile-field strong {
+            color: #263b32;
+            font-size: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .profile-stat {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding: 16px 12px;
+            border-radius: 14px;
+            background: #f7f8f5;
+        }
+
+        .profile-stat>span {
+            font-size: 20px;
+        }
+
+        .profile-stat strong {
+            color: #263b32;
+            font-size: 25px;
+        }
+
+        .profile-stat small {
+            color: #7c8981;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .profile-note {
+            margin-top: 18px;
+            line-height: 1.6;
+        }
+
+        .photo-upload {
+            display: inline-flex;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        #photoInput {
+            display: none;
+        }
+
+        @media (max-width: 850px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .profile-card {
+                padding: 18px;
+            }
+
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-top {
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .profile-photo-wrapper {
+                width: 76px;
+                height: 76px;
+                flex-basis: 76px;
+            }
+        }
+    </style>
+
+</head>
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register(
+            "/static/service-worker.js",
+            { scope: "/" }
+        ).catch(error => {
+            console.error("Service worker registration failed:", error);
+        });
+    });
+}
+</script>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar"><a class="brand" href="/app"><span
+                    class="brand-mark">⌂</span><span>HomeStock <b>AI</b></span></a>
+            <div class="side-label">WORKSPACE</div>
+            <nav class="side-nav">
+                <button class="nav-link active" data-page="home"><span>⌂</span> Overview</button><button
+                    class="nav-link" data-page="inventory"><span>▦</span> My inventory</button><button class="nav-link"
+                    data-page="scanner"><span>⌗</span> AI scanner <i>NEW</i></button><button class="nav-link"
+                    data-page="food"><span>♧</span> Fridge & freezer</button><button class="nav-link"
+                    data-page="recipes"><span>✳</span> Recipe ideas</button><button class="nav-link"
+                    data-page="shopping"><span>▤</span> Shopping list</button><button class="nav-link"
+                    data-page="chef"><span>✦</span> Chef Mummy</button>
+                <button class="nav-link" data-page="analytics"><span>❋</span> Insights</button>
+                <button class="nav-link" data-page="profile"><span class="avatar small">{{ user[:1]|upper
+                        }}</span>Account</button>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="help-card">
+                    <div class="help-icon">✿</div><b>A little less waste,<br>a little more ease.</b>
+                    <p>Small steps make a thoughtful home.</p>
+                </div>
+            </div>
+        </aside>
+        <main class="main">
+            <header class="topbar"><button class="mobile-menu" id="mobileMenu">☰</button>
+                <div class="crumb">Workspace <span>/</span> <b id="crumbName">Overview</b></div>
+                <div class="top-actions">
+                    <button class="theme-toggle" id="themeToggle" type="button" title="Switch theme"
+                        aria-label="Switch between light and dark themes">
+                        🌙
+                    </button>
+                    <div class="date-pill" id="todayLabel"></div><button class="icon-btn" id="alertsBtn"
+                        title="Alerts">♧<span class="dot"></span></button>
+
+                    <div class="profile-info">
+                        <b>{{ user }}</b>
+                        <a href="{{ url_for('logout') }}" class="logout-btn" title="Sign out">
+                            <span>Logout👤</span>
+                        </a>
+                    </div>
+
+
+                </div>
+            </header>
+            <div class="page-wrap">
+                <section class="page active" id="page-home">
+                    <div class="welcome-row">
+                        <div><span class="eyebrow">YOUR HOME, AT A GLANCE</span>
+                            <h1>Good day, {{ user.split(' ')[0] }} <span class="sun">✳</span></h1>
+                            <p class="muted">A little overview of everything you’re keeping track of.</p>
+                        </div><button class="btn primary" onclick="openAdd()">＋ Add an item</button>
+                    </div>
+                    <div class="hero-banner">
+                        <div class="hero-text"><span class="eyebrow light">A THOUGHTFUL HOME STARTS HERE</span>
+                            <h2>Know what you have.<br><em>Use what you love.</em></h2>
+                            <p>Stay on top of everyday essentials, one small step at a time.</p><button
+                                class="btn light-btn" onclick="showPage('scanner')">Scan household items
+                                <span>→</span></button>
+                        </div>
+                        <div class="hero-deco">
+                            <div class="hero-circle">⌂</div><span class="leaf leaf1">✿</span><span
+                                class="leaf leaf2">❋</span><span class="hero-note">made for everyday living</span>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-top"><span>Total items</span><span class="stat-icon peach">▦</span></div>
+                            <strong id="statTotal">0</strong><small>Products in your home</small>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-top"><span>Low stock</span><span class="stat-icon yellow">↘</span></div>
+                            <strong id="statLow">0</strong><small>Need a little attention</small>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-top"><span>Food reminders</span><span class="stat-icon green">♧</span>
+                            </div><strong id="statAlerts">0</strong><small>Recorded dates approaching</small>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-top"><span>Shopping list</span><span class="stat-icon lavender">▤</span>
+                            </div><strong id="statShopping">0</strong><small>Things to pick up</small>
+                        </div>
+                    </div>
+                    <div class="section-heading">
+                        <div><span class="eyebrow">EXPLORE YOUR HOME</span>
+                            <h2>Browse by category</h2>
+                        </div><button class="text-btn" onclick="showPage('inventory')">View all inventory →</button>
+                    </div>
+                    <div class="category-grid" id="categoryGrid"></div>
+                    <div class="two-col">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div><span class="eyebrow">NEEDS YOUR ATTENTION</span>
+                                    <h3>Little reminders</h3>
+                                </div><button class="text-btn" onclick="loadAlerts()">Refresh</button>
+                            </div>
+                            <div id="alertList" class="alert-list"></div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div><span class="eyebrow">RECENT ACTIVITY</span>
+                                    <h3>Recently updated</h3>
+                                </div><button class="text-btn" onclick="showPage('inventory')">See inventory</button>
+                            </div>
+                            <div id="recentList" class="recent-list"></div>
+                        </div>
+                    </div>
+                </section>
+                <section class="page" id="page-inventory">
+                    <div class="page-title">
+                        <div><span class="eyebrow">YOUR HOUSEHOLD COLLECTION</span>
+                            <h1>My inventory</h1>
+                            <p class="muted">Everything you own, organized beautifully.</p>
+                        </div><button class="btn primary" onclick="openAdd()">＋ Add product</button>
+                    </div>
+                    <div class="toolbar"><input id="inventorySearch" placeholder="⌕  Search your products..."
+                            oninput="renderInventory()"><select id="categoryFilter" onchange="renderInventory()">
+                            <option value="">All categories</option>{% for c in categories %}<option>{{c}}</option>{%
+                            endfor %}
+                        </select><select id="sortFilter" onchange="renderInventory()">
+                            <option value="name">Name A–Z</option>
+                            <option value="quantity">Quantity: low first</option>
+                            <option value="expiry">Expiry date</option>
+                        </select></div>
+                    <div class="inventory-grid" id="inventoryGrid"></div>
+                </section>
+                <section class="page" id="page-scanner">
+                    <div class="page-title">
+                        <div><span class="eyebrow">LESS TYPING, MORE LIVING</span>
+                            <h1>AI household scanner</h1>
+                            <p class="muted">Photograph a group of products, then review every suggestion before saving.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="scanner-layout">
+                        <div class="panel scanner-panel">
+                            <div class="upload-zone" id="dropZone">
+                                <div class="upload-icon">⌗</div>
+                                <h3>Drop your household photo here</h3>
+                                <p>or choose an image from your device</p><input type="file" id="scanFile"
+                                    accept="image/png,image/jpeg,image/webp" hidden><button class="btn primary"
+                                    onclick="document.getElementById('scanFile').click()">Choose a
+                                    photo</button><small>JPG, PNG or WEBP · Up to 8 MB</small>
+                            </div><img id="scanPreview" class="scan-preview" hidden>
+                        </div>
+                        <div class="panel scanner-info"><span class="eyebrow">HOW IT WORKS</span>
+                            <h3>Scan. Review. Confirm.</h3>
+                            <div class="step"><b>01</b>
+                                <div><strong>Capture together</strong>
+                                    <p>Place products in good light with labels visible.</p>
+                                </div>
+                            </div>
+                            <div class="step"><b>02</b>
+                                <div><strong>Review suggestions</strong>
+                                    <p>Correct names, categories and quantities.</p>
+                                </div>
+                            </div>
+                            <div class="step"><b>03</b>
+                                <div><strong>Confirm to save</strong>
+                                    <p>Nothing enters your inventory until you approve it.</p>
+                                </div>
+                            </div>
+                            <div class="notice">ⓘ Exact packaged-product recognition needs a custom-trained model.
+                                Unclear items can always be added manually.</div>
+                        </div>
+                    </div>
+                    <div id="scanReview" class="panel review-panel" hidden>
+                        <div class="panel-head">
+                            <div><span class="eyebrow">HUMAN-IN-THE-LOOP CHECK</span>
+                                <h3>Review detected items</h3>
+                            </div><span class="status-pill">Awaiting your confirmation</span>
+                        </div>
+                        <div id="detectionRows"></div><button class="btn primary" onclick="confirmScan()">Confirm & add
+                            to inventory →</button>
+                    </div>
+                </section>
+                <section class="page" id="page-food">
+                    <div class="page-title">
+                        <div><span class="eyebrow">FRESHNESS & FOOD CARE</span>
+                            <h1>Fridge & freezer</h1>
+                            <p class="muted">Keep an eye on what’s fresh and what should be used soon.</p>
+                        </div><button class="btn primary" onclick="openAdd(4)">＋ Add food</button>
+                    </div>
+                    <div class="food-banner">
+                        <div><span class="eyebrow light">A FRESH START</span>
+                            <h2>Make room for<br><em>something delicious.</em></h2>
+                            <p>Use recorded dates as reminders, and always check package guidance.</p>
+                        </div>
+                        <div class="food-illustration">🥑<span>🍋</span><b>✿</b></div>
+                    </div>
+                    <div class="section-heading">
+                        <div>
+                            <h2>Your cold storage</h2>
+                            <p class="muted">Food items you’ve added to your home.</p>
+                        </div><button class="text-btn" onclick="showPage('recipes')">Find recipe ideas →</button>
+                    </div>
+                    <div class="inventory-grid" id="foodGrid"></div>
+                    <div class="panel">
+                        <div class="panel-head">
+                            <h3>Freshness reminders</h3>
+                        </div>
+                        <div id="foodAlerts" class="alert-list"></div>
+                    </div>
+                </section>
+                <section class="page" id="page-recipes">
+                    <div class="page-title">
+                        <div><span class="eyebrow">INSPIRED BY YOUR INGREDIENTS</span>
+                            <h1>Recipe ideas</h1>
+                            <p class="muted">Simple inspiration based on what you have in your fridge.</p>
+                        </div>
+                    </div>
+                    <div class="recipe-intro"><span>✳</span>
+                        <div><b>Cook with what you have</b>
+                            <p>Recipes are ranked by the ingredients currently recorded in your food inventory.</p>
+                        </div>
+                    </div>
+                    <div class="recipe-grid" id="recipeGrid"></div>
+                </section>
+                <section class="page" id="page-shopping">
+                    <div class="page-title">
+                        <div><span class="eyebrow">A LITTLE LIST, A LOT LESS FORGETTING</span>
+                            <h1>Shopping list</h1>
+                            <p class="muted">Everything you need to pick up next time.</p>
+                        </div><button class="btn primary" onclick="addShoppingPrompt()">＋ Add to list</button>
+                    </div>
+                    <div class="shopping-tools"><button class="btn soft" onclick="generateShopping()">✦ Suggest
+                            low-stock items</button><span class="muted">Suggestions check your existing inventory
+                            first.</span></div>
+                    <div class="panel shopping-panel" id="shoppingList"></div>
+                </section>
+                <section class="page" id="page-chef">
+                    <div class="page-title">
+                        <div><span class="eyebrow">YOUR LITTLE KITCHEN COMPANION</span>
+                            <h1>Chef Mummy <span class="chef-spark">✳</span></h1>
+                            <p class="muted">A friendly helper that knows the food inventory you’ve recorded.</p>
+                        </div>
+                    </div>
+                    <div class="chat-shell">
+                        <div class="chat-head">
+                            <div class="chef-avatar">👩‍🍳</div>
+                            <div><b>Chef Mummy</b><small><span class="online-dot"></span> Ready to help ·
+                                    Inventory-aware</small></div><span class="chat-tag">HOME KITCHEN</span>
+                        </div>
+                        <div id="chatMessages" class="chat-messages">
+                            <div class="chat-bubble bot">Hello! I'm Chef Mummy. 🌿 I can help you explore your fridge
+                                ingredients, find recipe ideas, check low-stock items or review recorded food dates.
+                                What shall we make today?</div>
+                        </div>
+                        <div class="suggestions"><button onclick="sendChef('What ingredients do I have?')">What’s in my
+                                fridge?</button><button onclick="sendChef('Suggest a dinner recipe')">Dinner
+                                ideas</button><button onclick="sendChef('Which items are low stock?')">Low-stock
+                                check</button></div>
+                        <form class="chat-input" onsubmit="event.preventDefault();sendChef();"><input id="chefInput"
+                                placeholder="Ask Chef Mummy anything..." autocomplete="off"><button
+                                class="btn primary">Send ↑</button></form><small class="chat-disclaimer">Chef Mummy uses
+                            a local prototype response engine. Always verify food handling and safety with trusted
+                            guidance.</small>
+                    </div>
+                </section>
+                <section class="page" id="page-analytics">
+                    <div class="page-title">
+                        <div><span class="eyebrow">YOUR HOME, IN PERSPECTIVE</span>
+                            <h1>Household insights</h1>
+                            <p class="muted">A simple picture of your stock and recorded usage.</p>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><span>Total products</span><strong
+                                id="anTotal">0</strong><small>Different inventory records</small></div>
+                        <div class="stat-card"><span>Low-stock items</span><strong id="anLow">0</strong><small>At or
+                                below your threshold</small></div>
+                        <div class="stat-card"><span>Recorded value</span><strong id="anValue">₹0</strong><small>Based
+                                on entered price × quantity</small></div>
+                        <div class="stat-card"><span>Units consumed</span><strong
+                                id="anConsumed">0</strong><small>Recorded stock usage</small></div>
+                    </div>
+                    <div class="panel analytics-panel">
+                        <div class="panel-head">
+                            <div><span class="eyebrow">STOCK DISTRIBUTION</span>
+                                <h3>Where your essentials live</h3>
+                            </div>
+                        </div>
+                        <div id="analyticsBars"></div>
+                        <p class="notice">Prediction note: this prototype uses transparent minimum-stock thresholds.
+                            Personalized consumption forecasting needs sufficient dated stock-change history.</p>
+                    </div>
+                </section>
+
+                <!-- PROFILE PAGE -->
+                <section class="page" id="page-profile">
+
+                    <div class="page-title">
+                        <div>
+                            <span class="eyebrow">YOUR PERSONAL SPACE</span>
+                            <h1>My Profile</h1>
+                            <p class="muted">Your account and household information.</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-layout">
+
+                        <!-- Personal information -->
+                        <div class="panel profile-card">
+
+                            <div class="profile-top">
+
+                                <div class="profile-photo-wrapper">
+                                    <img id="profilePhoto" class="profile-photo" alt="Profile photo" hidden>
+
+                                    <div id="profileInitial" class="profile-initial">
+                                        {{ user[:1]|upper }}
+                                    </div>
+                                </div>
+
+                                <div class="profile-details">
+                                    <h2 id="profileName">{{ user }}</h2>
+                                    <p class="muted">HomeStock AI member</p>
+
+                                    <div class="profile-photo-actions">
+
+                                        <label for="photoInput" class="btn soft photo-upload">
+                                            Upload profile photo
+                                        </label>
+
+                                        <input type="file" id="photoInput" accept="image/png,image/jpeg,image/webp"
+                                            hidden>
+
+                                        <button type="button" id="removeProfilePhoto" class="remove-photo-btn" hidden>
+                                            Remove photo
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="profile-information">
+
+                                <div class="profile-field">
+                                    <span>Full name</span>
+                                    <strong id="profileFullName">Loading...</strong>
+                                </div>
+
+                                <div class="profile-field">
+                                    <span>Email address</span>
+                                    <strong id="profileEmail">Loading...</strong>
+                                </div>
+
+                                <div class="profile-field">
+                                    <span>Member since</span>
+                                    <strong id="profileDate">Loading...</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Household overview -->
+                        <div class="panel profile-card">
+
+                            <span class="eyebrow">YOUR HOUSEHOLD</span>
+                            <h2>Home at a glance</h2>
+
+                            <div class="profile-stats">
+
+                                <div class="profile-stat">
+                                    <span>📦</span>
+                                    <strong id="profileTotalItems">0</strong>
+                                    <small>Total products</small>
+                                </div>
+
+                                <div class="profile-stat">
+                                    <span>🏠</span>
+                                    <strong id="profileTotalQuantity">0</strong>
+                                    <small>Total recorded quantity</small>
+                                </div>
+
+                                <div class="profile-stat">
+                                    <span>🗂️</span>
+                                    <strong id="profileCategories">0</strong>
+                                    <small>Categories used</small>
+                                </div>
+
+                            </div>
+
+                            <p class="muted profile-note">
+                                These statistics are automatically calculated
+                                from your saved household inventory.
+                            </p>
+
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    <div class="modal-backdrop" id="itemModal">
+        <div class="modal">
+            <div class="modal-head">
+                <div><span class="eyebrow">MAKE IT YOURS</span>
+                    <h2 id="modalTitle">Add a product</h2>
+                </div><button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <form id="itemForm"><input type="hidden" id="editId">
+                <div class="form-grid"><label class="wide">Product name<input id="fName" required
+                            placeholder="e.g. Basmati rice"></label><label>Category<select id="fCategory" required>{%
+                            for c in categories %}<option>{{c}}</option>{% endfor
+                            %}</select></label><label>Quantity<input id="fQty" type="number" min="0" step="0.1"
+                            value="1" required></label><label>Unit<select id="fUnit">
+                            <option>pcs</option>
+                            <option>packets</option>
+                            <option>bottles</option>
+                            <option>kg</option>
+                            <option>g</option>
+                            <option>litres</option>
+                            <option>ml</option>
+                            <option>boxes</option>
+                        </select></label><label>Minimum stock<input id="fMin" type="number" min="0" step="0.1"
+                            value="1"></label><label>Date stocked<input id="fStocked" type="date"></label><label>Expiry
+                        / use-by date<input id="fExpiry" type="date"></label><label>Storage location<input
+                            id="fLocation" placeholder="e.g. Pantry shelf"></label><label>Unit price (₹)<input
+                            id="fPrice" type="number" min="0" step="0.01" value="0"></label><label
+                        class="wide">Notes<textarea id="fNotes" rows="2"
+                            placeholder="Optional details"></textarea></label></div>
+                <div class="modal-actions"><button type="button" class="btn soft"
+                        onclick="closeModal()">Cancel</button><button class="btn primary">Save product</button></div>
+            </form>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script src="{{ url_for('static',filename='js/app.js') }}"></script>
+</body>
+
+</html>
