@@ -11,11 +11,13 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
-    <link rel="manifest" href="/static/manifest.json">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
     <meta name="theme-color" content="#355d49">
 
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <style>
         /* Profile page layout */
         .profile-layout {
@@ -168,17 +170,18 @@
 
 </head>
 <script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register(
-            "/static/service-worker.js",
-            { scope: "/" }
-        ).catch(error => {
-            console.error("Service worker registration failed:", error);
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register(
+                "/static/service-worker.js",
+                { scope: "/" }
+            ).catch(error => {
+                console.error("Service worker registration failed:", error);
+            });
         });
-    });
-}
+    }
 </script>
+
 <body>
     <div class="app-shell">
         <aside class="sidebar" id="sidebar"><a class="brand" href="/app"><span
