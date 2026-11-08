@@ -8,6 +8,9 @@ __pycache__/
 .env
 .env.*
 
+# Local database
+homestock.db
+
 # Uploaded user files
 uploads/*
 !uploads/.gitkeep
