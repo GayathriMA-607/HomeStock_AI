@@ -14,7 +14,7 @@ UPLOAD_DIR = os.path.join(BASE, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "dev-only-change-this-secret")
+app.secret_key = os.getenv("SECRET_KEY")
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 app.config["UPLOAD_FOLDER"] = UPLOAD_DIR
 CATEGORIES = [

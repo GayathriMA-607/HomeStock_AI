@@ -1,0 +1,16 @@
+# Python environment
+venv/
+xvenv/
+__pycache__/
+*.pyc
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Local database
+homestock.db
+
+# Uploaded user files
+uploads/*
+!uploads/.gitkeep
